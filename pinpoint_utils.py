@@ -2,6 +2,8 @@
 # 2019-04-23 16:52:15
 # for teh grokking
 
+# https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html
+
 # tpl_campaign list segments
 # tpl_campaign delete segment <segment_id>  {probably need to define rules here}
 # tpl_campaign create segment segment_name=“<string>” attributes=attr_x=ABC and attr_y=XYZ [user-pool=FOOBAR_ENV]
@@ -20,43 +22,27 @@
 import boto3
 import pprint
 
-# boto3.resource or ?
-
-# awsutils? not in tp-api, not [aws-utils · PyPI ](https://pypi.org/project/aws-utils/)
-# from this: [Automating AWS EC2 Management with Python and Boto3 ](https://stackabuse.com/automating-aws-ec2-management-with-python-and-boto3/)
-# >>> session = awsutils.get_session('eu-west-1')
-# >>> client = session.client('pinpoint')
-# >>> pprint.pprint(client.describe_instances())
-
-# 19/04/23 15:53:49 cjb-tp-macbook:~/Projects/trust-power-api/lambdas/notification-service/scripts/pinpoint ±(feature/TPL-127-wip-pinpoint-segs-and-campaigns) ✗ 
-# bpython uses python3 by default
-# ❯ bpython
-# bpython version 0.18 on top of Python 3.7.2 /usr/local/opt/python/bin/python3.7
-# >>> import boto3
-# >>> boto3.session.Session()
-# Session(region_name='eu-west-1')
-
-# 19/04/23 15:06:16 cjb-tp-macbook:~/Projects/trust-power-api/lambdas/notification-service/scripts/pinpoint ±(feature/TPL-127-wip-pinpoint-segs-and-campaigns) ✗ 
-# ❯ cat ~/.aws/*
-# config:
-# [default]
-# output = json
-# region = eu-west-1
-# credentials:
-# [default]
-# aws_access_key_id = ...
-# aws_secret_access_key = ...
-
 # region-specific Session object
 # is this necessary? when can do `boto3.client('pinpoint')`
 # and when defaults to value in ~/.aws/credentials, e.g. `region = eu-west-1`
-def get_session(region='eu-west-1'):  
+# >>> sess = boto3.session.Session()
+# >>> sess
+# Session(region_name='eu-west-1')
+def get_session(region='eu-west-1'):
   return boto3.session.Session(region_name=region)
 
 
+def get_client():
+  return get_session().client('pinpoint')
+  # or: return boto3.client('pinpoint')
+    # yes, seems to be the same
+
+# def get_client2():
+#   return boto3.client('pinpoint')
+
+
 def get_secrets():
-  # argparse? via jb?
-  # appconnect noddy method? general.git:dev/bin/appconnect gitignored?
+  # general.git:dev/bin/appconnect noddy method:
   secrets_file = open('./secrets.sh', 'r')
   lines = secrets_file.readlines()
   secrets = {}
@@ -65,21 +51,6 @@ def get_secrets():
       secrets['pinpoint_project_id'] = line[line.find('=')+1:].strip()
   secrets_file.close() # or do `with open(file, 'r') as f: x = f.readlines()`
   return secrets
-
-
-# 19/04/23 16:59:01 cjb-tp-macbook:~/Projects/trust-power-api/lambdas/notification-service/scripts/pinpoint ±(feature/TPL-127-wip-pinpoint-segs-and-campaigns) ✗ 
-# ❯ bpython
-# bpython version 0.18 on top of Python 3.7.2 /usr/local/opt/python/bin/python3.7
-# >>> import pinpoint_utils
-# >>> pinpoint_utils.get_client()
-# <botocore.client.Pinpoint object at 0x110452d68>
-def get_client():
-  return get_session().client('pinpoint')
-  # or: return boto3.client('pinpoint')
-
-# def get_client2():
-#   return boto3.client('pinpoint')
-#   # return get_session().client('pinpoint')
 
 
 def print_endpoint(endpoint_id, pinpoint_id=get_secrets()['pinpoint_project_id']):
@@ -103,36 +74,60 @@ def list_segments():
   segs = get_client().get_segments(
     ApplicationId=get_secrets()['pinpoint_project_id'],
     # PageSize='10',
-    # Token='string' # ?? Invalid Token Received # for pagination
+    # Token='string' # for pagination
   )
   pprint.pprint(segs)
 
 
-def delete_segment():
-  pass
+# tpl_campaign delete segment <segment_id>  {probably need to define rules here}
+# https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html#Pinpoint.Client.delete_segment
+def delete_segment(segment_id):
+  get_client().delete_segment(
+    ApplicationId=get_secrets()['pinpoint_project_id'],
+    SegmentId=segment_id
+  )
 
 
-def create_segment():
-  pass
+# tpl_campaign create segment segment_name=“<string>” attributes=attr_x=ABC and attr_y=XYZ [user-pool=FOOBAR_ENV]
+# https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html#Pinpoint.Client.create_segment
+def create_segment(segment_name, attributes, user_pool=None):
+  response = get_client().create_segment(
+    # lots of stuff
+  )
 
-# response = client.get_campaigns(
-#     ApplicationId='string',
-#     PageSize='string',
-#     Token='string'
-# )
-def list_campaigns():
+
+# tpl_campaign list campaigns [user-pool=FOOBAR_ENV]
+# https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html#Pinpoint.Client.get_campaigns
+def list_campaigns(user_pool=None):
   camps = get_client().get_campaigns(
     ApplicationId=get_secrets()['pinpoint_project_id'],
     # PageSize='10',
-    # Token='string' # ?? Invalid Token Received # for pagination
+    # Token='string' # for pagination
   )
   pprint.pprint(camps)
 
 
-def delete_campaign():
-  pass
+# tpl_campaign delete campaign <campaign_id> [user-pool=FOOBAR_ENV]
+#             {probably need to define rules here}
+# https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html#Pinpoint.Client.delete_campaign
+def delete_campaign(campaign_id, user_pool=None):
+  # TODO are you sure?
+  get_client().delete_campaign(
+      ApplicationId=get_secrets()['pinpoint_project_id'],
+      CampaignId=campaign_id
+  )
 
 
-def create_campaign():
-  pass
-
+# tpl_campaign create campaign
+#              segment=<segment_id>
+#              campaign_name=<string> 
+#              title=“Hum bug”
+#              message_body=“go figure”
+#              launch=<date_time_to_send_message, epoch_or_standard_format, SendIn_N_minutes>
+#              user-pool=FOOBAR_ENV
+# https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html#Pinpoint.Client.create_campaign
+def create_campaign(segment, campaign_name, title, message_body, launch, user_pool):
+  response = get_client().create_campaign(
+    # huge amount of stuff
+  )
+  # parse response
