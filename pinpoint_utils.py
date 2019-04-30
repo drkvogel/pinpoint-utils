@@ -47,7 +47,7 @@ def get_secrets():
   lines = secrets_file.readlines()
   secrets = {}
   for line in lines:
-    if line.find('PINPOINT_PROJECT_ID') != -1:
+    if line.find('PINPOINT_APP_ID') != -1:
       secrets['pinpoint_project_id'] = line[line.find('=')+1:].strip()
   secrets_file.close() # or do `with open(file, 'r') as f: x = f.readlines()`
   return secrets
