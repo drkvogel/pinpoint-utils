@@ -1,6 +1,6 @@
 
 [TPL-127 Create Pinpoint segments & campaigns for time-based push notifications - Jira ](https://trustpower-com.atlassian.net/browse/TPL-127) 
-  2019-04-23 13:00:15 linkified!
+  
 
 1.	Create script to create segment from attributes
 2.	Create script to create campaign from segments
@@ -21,7 +21,8 @@ The *Attributes* portion within the JSON returned by the above command has been 
 aws pinpoint update-endpoint --application-id ${APPLICATION_ID} --region us-east-1  --endpoint-id ${ep_id} --endpoint-request file://${JSON_FILE}
 ```
 
-Where JSON_FILE contains;
+Where `JSON_FILE` contains, e.g.:
+
 ```json
 {
   "Attributes": {
@@ -85,3 +86,6 @@ Session(region_name='eu-west-1')
 >>> 
 ```
 
+## done
+
+2019-04-23 13:00:15 linkified!
