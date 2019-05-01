@@ -19,8 +19,19 @@
 #              launch=<date_time_to_send_message, epoch_or_standard_format, SendIn_N_minutes>
 #              user-pool=FOOBAR_ENV
 
+import sys
 import boto3
 import pprint
+
+# stuff to run always here such as class/def
+def main():
+    pass
+
+
+if __name__ == "__main__":
+   # stuff only to run when not called via 'import' here
+   main()
+
 
 # region-specific Session object
 # is this necessary? when can do `boto3.client('pinpoint')`
@@ -40,6 +51,7 @@ def get_client():
 # def get_client2():
 #   return boto3.client('pinpoint')
 
+dry_run = True
 
 def get_secrets():
   # general.git:dev/bin/appconnect noddy method:
@@ -51,6 +63,17 @@ def get_secrets():
       secrets['pinpoint_project_id'] = line[line.find('=')+1:].strip()
   secrets_file.close() # or do `with open(file, 'r') as f: x = f.readlines()`
   return secrets
+
+
+# https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html#Pinpoint.Client.get_user_endpoints
+def print_endpoints():
+  print('pinpoint_id: ' + pinpoint_id)
+  client = get_client()
+  response = client.get_user_endpoints( # "only accepts keyword arguments"
+      ApplicationId=pinpoint_id,   # pinpoint app id - doesn't change?
+      EndpointId=endpoint_id       #? have to create by running app?
+  )
+  pprint.pprint(response)
 
 
 def print_endpoint(endpoint_id, pinpoint_id=get_secrets()['pinpoint_project_id']):
@@ -82,23 +105,35 @@ def list_segments():
 # tpl_campaign delete segment <segment_id>  {probably need to define rules here}
 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html#Pinpoint.Client.delete_segment
 def delete_segment(segment_id):
-  get_client().delete_segment(
-    ApplicationId=get_secrets()['pinpoint_project_id'],
-    SegmentId=segment_id
-  )
+  print(f'Deleting segment id: {segment_id}')
+  are_you_sure()
+  print('TODO')
+  sys.exit()
+  if not dry_run:
+    get_client().delete_segment(
+      ApplicationId=get_secrets()['pinpoint_project_id'],
+      SegmentId=segment_id
+    )
 
 
 # tpl_campaign create segment segment_name=“<string>” attributes=attr_x=ABC and attr_y=XYZ [user-pool=FOOBAR_ENV]
 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html#Pinpoint.Client.create_segment
 def create_segment(segment_name, attributes, user_pool=None):
-  response = get_client().create_segment(
-    # lots of stuff
-  )
+  print('TODO')
+  sys.exit()
+  print(f'Creating segment name: {segment_name}')
+  if not dry_run:
+    response = get_client().create_segment(
+      # lots of stuff
+    )
 
 
 # tpl_campaign list campaigns [user-pool=FOOBAR_ENV]
 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html#Pinpoint.Client.get_campaigns
 def list_campaigns(user_pool=None):
+  print('list campaigns')
+  print('TODO')
+  sys.exit()
   camps = get_client().get_campaigns(
     ApplicationId=get_secrets()['pinpoint_project_id'],
     # PageSize='10',
@@ -106,16 +141,26 @@ def list_campaigns(user_pool=None):
   )
   pprint.pprint(camps)
 
+def are_you_sure():
+  if not input("Are you sure? (y/n): ").lower().strip()[:1] == "y": 
+    print('Quitting.')
+    sys.exit(1)
 
 # tpl_campaign delete campaign <campaign_id> [user-pool=FOOBAR_ENV]
 #             {probably need to define rules here}
 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html#Pinpoint.Client.delete_campaign
 def delete_campaign(campaign_id, user_pool=None):
   # TODO are you sure?
-  get_client().delete_campaign(
-      ApplicationId=get_secrets()['pinpoint_project_id'],
-      CampaignId=campaign_id
-  )
+  print(f'Deleting campaign id: {campaign_id}')
+  # if not input("Are you sure? (y/n): ").lower().strip()[:1] == "y": sys.exit(1)
+  are_you_sure()
+  print('TODO')
+  sys.exit()
+  if not dry_run:
+    get_client().delete_campaign(
+        ApplicationId=get_secrets()['pinpoint_project_id'],
+        CampaignId=campaign_id
+    )
 
 
 # tpl_campaign create campaign
@@ -127,7 +172,13 @@ def delete_campaign(campaign_id, user_pool=None):
 #              user-pool=FOOBAR_ENV
 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html#Pinpoint.Client.create_campaign
 def create_campaign(segment, campaign_name, title, message_body, launch, user_pool):
-  response = get_client().create_campaign(
-    # huge amount of stuff
-  )
-  # parse response
+  print(f'Creating campaign for segment: {segment}, name: {campaign_name}')
+  are_you_sure()
+  print('TODO')
+  sys.exit()
+  if not dry_run:
+    response = get_client().create_campaign(
+      # huge amount of stuff
+    )
+    # parse response
+
