@@ -87,13 +87,17 @@ class PinpointUtils():
 
 
   # def print_endpoint(self, endpoint_id, pinpoint_id=get_secrets()['pinpoint_project_id']):
+    # get_secrets() is run on import when in the args like this
   def print_endpoint(self, endpoint_id):
     # client = boto3.client('pinpoint') # assumes region from env?
     # if pinpoint_id == None: # smell
-    pinpoint_id = get_secrets()['pinpoint_project_id']
+    client = self.get_client()
+    pinpoint_id = self.get_secrets()['pinpoint_project_id']
     #   print('defaulted pinpoint_id to ' + get_secrets()['pinpoint_project_id'])
     print('pinpoint_id: ' + pinpoint_id)
-    client = get_client()
+    are_you_sure()
+    print('TODO')
+    sys.exit()
     response = client.get_endpoint( # "only accepts keyword arguments"
         ApplicationId=pinpoint_id,   # pinpoint app id - doesn't change?
         EndpointId=endpoint_id       #? have to create by running app?
