@@ -1,4 +1,5 @@
 
+
 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html
 
 # tpl_campaign list segments
@@ -20,21 +21,22 @@ import sys
 import boto3
 import pprint
 
+# stuff to run always here such as class/def
+# def main():
+#     pass
+
+
 if __name__ == "__main__":
   print('__name__ == "__main__"')
+  # stuff only to run when not called via 'import' here
+  # main()
   # utils = PinpointUtils()
+  pass
 
 # >>> from pinpoint_utils import PinpointUtils
 # >>> utils = PinpointUtils()
 
 class PinpointUtils():
-
-  def __init__(self):
-    self.client = get_client()
-    self.secrets_file = './secrets.sh'
-    self.dry_run = True
-    # pass
-
 
   # region-specific Session object
   # is this necessary? when can do `boto3.client('pinpoint')`
@@ -45,15 +47,19 @@ class PinpointUtils():
   def get_session(region='eu-west-1'):
     return boto3.session.Session(region_name=region)
 
-
   def get_client(self):
     return get_session().client('pinpoint')
     # or: return boto3.client('pinpoint')
+      # yes, seems to be the same
 
+  # def get_client2(self):
+  #   return boto3.client('pinpoint')
+
+  dry_run = True
 
   def get_secrets(self):
-    # with open(file, 'r') as f:
-    secrets_file = open(self.secrets_file, 'r')
+    # general.git:dev/bin/appconnect noddy method:
+    secrets_file = open('./secrets.sh', 'r')
     lines = secrets_file.readlines()
     secrets = {}
     for line in lines:
@@ -95,8 +101,8 @@ class PinpointUtils():
   # Used to get information about your segments.
   # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html#Pinpoint.Client.get_segment
   def list_segments(self):
-    segs = self,get_client().get_segments(
-      ApplicationId=self.get_secrets()['pinpoint_project_id'],
+    segs = get_client().get_segments(
+      ApplicationId=get_secrets()['pinpoint_project_id'],
       # PageSize='10',
       # Token='string' # for pagination
     )

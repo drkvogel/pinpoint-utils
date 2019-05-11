@@ -10,9 +10,6 @@
 # is this in import_dev_secrets.sh? no
 # in ./secrets.sh
 
-# howto create pinpoint segment
-
-# howto create pinpoint segment in python - Google Search (https://www.google.com/search?rlz=1C5CHFA_enGB838GB838&ei=kBS3XJXyIMXDxgPg84uwBA&q=howto+create+pinpoint+segment+in+python&oq=howto+create+pinpoint+segment+in+python&gs_l=psy-ab.3..33i21.15309.17164..17419...0.0..0.113.944.8j2......0....1..gws-wiz.......0i71j33i22i29i30j33i160.yqpRVBEzqsQ)
 #     create-segment — AWS CLI 1.16.141 Command Reference (https://docs.aws.amazon.com/cli/latest/reference/pinpoint/create-segment.html)
 #     Pinpoint — Boto 3 Docs 1.9.131 documentation (https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/pinpoint.html)
 
